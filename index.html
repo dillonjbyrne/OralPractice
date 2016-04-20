@@ -13,10 +13,12 @@
         <div>
             <select></select>
             <button onclick="ask()">Ask me a question!</button>
+            <button onclick="repeat()">Repeat the last question</button>
         </div>
         <script>
             var voiceSelect = document.querySelector('select');
             var voices = [];
+            var question;
             
             function populateVoiceList() {
                 var synth = window.speechSynthesis;
@@ -43,7 +45,19 @@
             
             function ask() {
                 var questions = document.getElementById("question_input").value.split("\n");
-                var question = questions[Math.floor(Math.random()*questions.length)];
+                question = questions[Math.floor(Math.random()*questions.length)];
+                var msg = new SpeechSynthesisUtterance(question);
+                var selectedVoice = voiceSelect.selectedOptions[0].getAttribute('data-name');
+                for (i = 0; i < voices.length; ++i) {
+                    if (voices[i].name === selectedVoice) {
+                        msg.voice = voices[i];
+                        break;
+                    }
+                }
+                window.speechSynthesis.speak(msg);
+            }
+            
+            function repeat() {
                 var msg = new SpeechSynthesisUtterance(question);
                 var selectedVoice = voiceSelect.selectedOptions[0].getAttribute('data-name');
                 for (i = 0; i < voices.length; ++i) {
