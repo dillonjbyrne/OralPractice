@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Oral Practice</title>
+        <meta name="description" content="A study aid for oral exams.">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+        <p>Enter all of your questions in the text-box below. One question per line.</p>
+        <textarea id="question_input"></textarea>
+        <div>
+            <select></select>
+            <button onclick="ask()">Ask me a question!</button>
+        </div>
+        <script>
+            var voiceSelect = document.querySelector('select');
+            var voices = [];
+            
+            function populateVoiceList() {
+                var synth = window.speechSynthesis;
+                voices = synth.getVoices();
+
+                for(i = 0; i < voices.length ; i++) {
+                  var option = document.createElement('option');
+                  option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
+
+                  if(voices[i].default) {
+                    option.textContent += ' -- DEFAULT';
+                  }
+
+                  option.setAttribute('data-lang', voices[i].lang);
+                  option.setAttribute('data-name', voices[i].name);
+                  voiceSelect.appendChild(option);
+                }
+            }
+            
+            populateVoiceList();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populateVoiceList;
+            }
+            
+            function ask() {
+                var questions = document.getElementById("question_input").value.split("\n");
+                var question = questions[Math.floor(Math.random()*questions.length)];
+                var msg = new SpeechSynthesisUtterance(question);
+                var selectedVoice = voiceSelect.selectedOptions[0].getAttribute('data-name');
+                for (i = 0; i < voices.length; ++i) {
+                    if (voices[i].name === selectedVoice) {
+                        msg.voice = voices[i];
+                        break;
+                    }
+                }
+                window.speechSynthesis.speak(msg);
+            }
+        </script>
+    </body>
+</html>
